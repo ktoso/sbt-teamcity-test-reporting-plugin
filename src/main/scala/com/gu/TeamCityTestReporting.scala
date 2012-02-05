@@ -20,14 +20,17 @@ class TeamCityTestListener extends TestReportListener {
     // group has started, the tests from different projects will get mixed up.
   }
 
+  /** called before each test method or equivalent */
+  def startTest(testName: String) {
+    teamcityReport("testStarted", "name" -> testName)
+  }
+
   /** called for each test method or equivalent */
-  def testEvent(event: TestEvent) {
+  def testEvent(event: TestEvent) { }
+
+  /** called after each test method or equivalent */
+  def endTest(event: TestEvent) {
     for (e: TEvent <- event.detail) {
-
-      // this is a lie: the test has already been executed and started by this point,
-      // but sbt doesn't send an event when test starts
-      teamcityReport("testStarted", "name" -> e.testName)
-
       e.result match {
         case TResult.Success => // nothing extra to report
         case TResult.Error | TResult.Failure =>
